@@ -7,14 +7,19 @@ function IntRes = CoefIntegrationPiecewise(ziDsc, M1yz, M2zj, dz)
 % array ny x nz, M2 as nz x nm. ziDsc contains indices of discontinuities
 % in z.
 
-if ziDsc(1)>1
-    ziDscNoSurface = ziDsc;
+
+if ~isempty(ziDsc)
+    if ziDsc(1)>1
+        ziDscNoSurface = ziDsc;
+    else
+        ziDscNoSurface(1:length(ziDsc)-1) = ziDsc(2:end);
+    end;
+    
+    % IntRes = dz*(  M1yz*M2zj - 0.5*M1yz(:,1)*M2zj(1,:) - 0.5*M1yz(:,end)*M2zj(end,:)+...
+    %     0.5*M1yz(:,ziDscNoSurface)*M2zj(ziDscNoSurface,:) - 0.5*M1yz(:,ziDscNoSurface-1)*M2zj(ziDscNoSurface-1,:)   );
+    
+    IntRes = dz*(  M1yz*M2zj - 0.5*M1yz(:,1)*M2zj(1,:) - 0.5*M1yz(:,end)*M2zj(end,:)-...
+        0.5*M1yz(:,ziDscNoSurface)*M2zj(ziDscNoSurface,:) + 0.5*M1yz(:,ziDscNoSurface-1)*M2zj(ziDscNoSurface-1,:)   );
 else
-    ziDscNoSurface(1:length(ziDsc)-1) = ziDsc(2:end);
+    IntRes = dz*(  M1yz*M2zj - 0.5*M1yz(:,1)*M2zj(1,:) - 0.5*M1yz(:,end)*M2zj(end,:));
 end;
-
-% IntRes = dz*(  M1yz*M2zj - 0.5*M1yz(:,1)*M2zj(1,:) - 0.5*M1yz(:,end)*M2zj(end,:)+...
-%     0.5*M1yz(:,ziDscNoSurface)*M2zj(ziDscNoSurface,:) - 0.5*M1yz(:,ziDscNoSurface-1)*M2zj(ziDscNoSurface-1,:)   );
-
-IntRes = dz*(  M1yz*M2zj - 0.5*M1yz(:,1)*M2zj(1,:) - 0.5*M1yz(:,end)*M2zj(end,:)-...
-    0.5*M1yz(:,ziDscNoSurface)*M2zj(ziDscNoSurface,:) + 0.5*M1yz(:,ziDscNoSurface-1)*M2zj(ziDscNoSurface-1,:)   );

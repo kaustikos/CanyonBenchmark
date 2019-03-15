@@ -21,7 +21,7 @@ function [wnum, wmode, varargout] = ac_modes(z,MediaParams,freq, varargin)
 % BotBC determines the boundary condition at the bottom: 'D' for Dirichlet (default),
 % 'N' for Neumann
 
-
+% 2019.02.14: edited normalization procedure. Now vgs are more accurate.
 
 if isstruct(MediaParams)
     LayersData = MediaParams.LayersData;
@@ -205,7 +205,13 @@ wvectfm = repmat(wvectf,nz,1);
 
 if ~isempty(wnum)
     wmode = fliplr(wmode.*wvectfm);
-    mnorms(1:nmod) = dz*trapz((wmode.^2)./repmat(d',1,nmod));
+    
+    
+    %mnorms(1:nmod) = dz*trapz((wmode.^2)./repmat(d',1,nmod));
+    
+    [ziDsc, ~, d] = MediaParamsToVectors(z,MediaParams);
+    mnorms(1:nmod) = CoefIntegrationPiecewise(ziDsc, 1./( d ), wmode.^2, dz);
+    
     wmode = wmode./repmat(mnorms.^(0.5),nz,1);
 else
     wmode = [];
